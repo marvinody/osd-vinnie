@@ -1,26 +1,27 @@
+import OpenSeadragon from 'openseadragon';
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+
+class App extends React.Component {
+
+  componentDidMount() {
+    this.osd = new OpenSeadragon({
+      id: 'openseadragon',
+      prefixUrl: 'https://openseadragon.github.io/openseadragon/images/',
+      tileSources: '//openseadragon.github.io/example-images/highsmith/highsmith.dzi',
+      crossOriginPolicy: 'Anonymous'
+    });
+
+  }
+  render() {
+    return (
+      <div className="App">
+        <div id="openseadragon"></div>
+      </div>
+    );
+  }
 }
+
 
 export default App;
