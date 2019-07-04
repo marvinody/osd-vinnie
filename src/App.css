@@ -13,4 +13,14 @@
   height: 600px;
 }
 
-@import url('https://openseadragon.github.io/css/style.css')
+.sliders {
+  display: flex;
+}
+
+.hema,
+.eosin {
+  display: flex;
+  flex-direction: column;
+}
+
+/* @import url('https://openseadragon.github.io/css/style.css') */
