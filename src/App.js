@@ -1,18 +1,32 @@
+import memoize from 'fast-memoize';
 import OpenSeadragon from 'openseadragon';
 import React from 'react';
 import './App.css';
 import './deps/osd-filter';
 
+const memoizedExp = memoize(Math.exp)
+
+const sigFigExp = (n) => {
+  return memoizedExp(n.toFixed(2))
+}
+
 class App extends React.Component {
   constructor() {
     super();
     this.state = {
-      red: true,
-      green: true,
-      blue: true,
+      b_hema_red: 0.5,
+      b_hema_green: 0.5,
+      b_hema_blue: 0.5,
+      b_eosin_red: 0.5,
+      b_eosin_green: 0.5,
+      b_eosin_blue: 0.5,
+      k: 2.5
     }
   }
   genFilters() {
+    const { b_hema_red, b_hema_green, b_hema_blue } = this.state;
+    const { b_eosin_red, b_eosin_green, b_eosin_blue } = this.state;
+    const { k } = this.state;
     this.osd.setFilterOptions({
       filters: {
         processors: (context, callback) => {
@@ -24,14 +38,21 @@ class App extends React.Component {
           for (let i = 0; i < context.canvas.height; i += 1) {
             for (let j = 0; j < context.canvas.width; j += 1) {
               const
-                r = originalPixels[idx + 0],
-                g = originalPixels[idx + 1],
-                b = originalPixels[idx + 2],
-                a = originalPixels[idx + 3];
-              pixels[idx + 0] = this.state.red ? r : 0
-              pixels[idx + 1] = this.state.green ? g : 0
-              pixels[idx + 2] = this.state.blue ? b : 0
-              pixels[idx + 3] = a
+                I_dna = originalPixels[idx + 0] / 255,
+                I_eosin = originalPixels[idx + 1] / 255;
+              const
+                r_factor = (b_hema_red * I_dna + b_eosin_red * I_eosin),
+                g_factor = (b_hema_green * I_dna + b_eosin_green * I_eosin),
+                b_factor = (b_hema_blue * I_dna + b_eosin_blue * I_eosin);
+
+              const
+                r = sigFigExp(-k * r_factor) * 255,
+                g = sigFigExp(-k * g_factor) * 255,
+                b = sigFigExp(-k * b_factor) * 255;
+              pixels[idx + 0] = r
+              pixels[idx + 1] = g
+              pixels[idx + 2] = b
+              pixels[idx + 3] = originalPixels[idx + 3]
 
               idx += 4;
             }
@@ -51,29 +72,42 @@ class App extends React.Component {
     });
     this.genFilters();
   }
-  toggleColor = (c) => {
-    this.setState(prev => ({
-      [c]: !prev[c]
-    }), () => {
-      this.genFilters()
+  handleChange = (e) => {
+    this.setState({
+      [e.target.name]: e.target.value,
     })
+    this.genFilters();
   }
   render() {
     return (
       <div className="App">
         <div id="openseadragon"></div>
         <div>
-          <span>
-            Red:
-            <input type='checkbox' checked={this.state.red} onChange={() => this.toggleColor('red')}></input>
-            Green:
-            <input type='checkbox' checked={this.state.green} onChange={() => this.toggleColor('green')}></input>
-            Blue:
-            <input type='checkbox' checked={this.state.blue} onChange={() => this.toggleColor('blue')}></input>
-          </span>
+          <div className="sliders">
+            <div className="hema">
+              <span>Hema:</span>
+              {this.makeInput("b_hema_red", "red")}
+              {this.makeInput("b_hema_green", "green")}
+              {this.makeInput("b_hema_blue", "blue")}
+            </div>
+            <div className="eosin">
+              <span>Eosin:</span>
+              {this.makeInput("b_eosin_red", "red")}
+              {this.makeInput("b_eosin_green", "green")}
+              {this.makeInput("b_eosin_blue", "blue")}
+            </div>
+          </div>
         </div>
       </div>
     );
+  }
+  makeInput(name, label) {
+    return (
+      <span>
+        <label htmlFor={name}>{label}:</label>
+        <input type="range" min="0" max="1" name={name} value={this.state[name]} onChange={this.handleChange} step="0.01" />
+      </span>
+    )
   }
 }
 
