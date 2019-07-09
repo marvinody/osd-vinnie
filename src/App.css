@@ -4,8 +4,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 100vw;
-  height: 100vh;
+  flex-direction: column;
 }
 
 #openseadragon {
@@ -21,6 +20,14 @@
 .eosin {
   display: flex;
   flex-direction: column;
+}
+
+.osd-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  color: white;
 }
 
 /* @import url('https://openseadragon.github.io/css/style.css') */

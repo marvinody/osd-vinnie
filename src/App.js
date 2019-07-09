@@ -20,8 +20,27 @@ class App extends React.Component {
       b_eosin_red: 0.5,
       b_eosin_green: 0.5,
       b_eosin_blue: 0.5,
-      k: 2.5
+      k: 2.5,
+      imageLink: 'http://openseadragon.github.io/example-images/highsmith/highsmith.dzi',
     }
+    // this is needed so we can clear the osd div each load
+    // otherwise osd just makes a new layout for each button click
+    this.osdRef = React.createRef();
+  }
+  loadOSD = () => {
+    // remove all children in the osd div before making new one
+    const osd = this.osdRef.current
+    while (osd.firstChild) {
+      osd.removeChild(osd.firstChild)
+    }
+
+    this.osd = new OpenSeadragon({
+      id: 'openseadragon',
+      prefixUrl: 'https://openseadragon.github.io/openseadragon/images/',
+      tileSources: this.state.imageLink,
+      crossOriginPolicy: 'Anonymous'
+    });
+    this.genFilters();
   }
   genFilters() {
     const { b_hema_red, b_hema_green, b_hema_blue } = this.state;
@@ -64,13 +83,7 @@ class App extends React.Component {
     });
   }
   componentDidMount() {
-    this.osd = new OpenSeadragon({
-      id: 'openseadragon',
-      prefixUrl: 'https://openseadragon.github.io/openseadragon/images/',
-      tileSources: '//openseadragon.github.io/example-images/highsmith/highsmith.dzi',
-      crossOriginPolicy: 'Anonymous'
-    });
-    this.genFilters();
+    this.loadOSD()
   }
   handleChange = (e) => {
     this.setState({
@@ -81,20 +94,27 @@ class App extends React.Component {
   render() {
     return (
       <div className="App">
-        <div id="openseadragon"></div>
-        <div>
-          <div className="sliders">
-            <div className="hema">
-              <span>Hema:</span>
-              {this.makeInput("b_hema_red", "red")}
-              {this.makeInput("b_hema_green", "green")}
-              {this.makeInput("b_hema_blue", "blue")}
-            </div>
-            <div className="eosin">
-              <span>Eosin:</span>
-              {this.makeInput("b_eosin_red", "red")}
-              {this.makeInput("b_eosin_green", "green")}
-              {this.makeInput("b_eosin_blue", "blue")}
+        <div className='link-container'>
+          <input type='text' name='imageLink' onChange={this.handleChange} value={this.state.imageLink}></input>
+          <button onClick={this.loadOSD}>Reload</button>
+        </div>
+        <div className='osd-container'>
+
+          <div id="openseadragon" ref={this.osdRef}></div>
+          <div>
+            <div className="sliders">
+              <div className="hema">
+                <span>Hema:</span>
+                {this.makeInput("b_hema_red", "red")}
+                {this.makeInput("b_hema_green", "green")}
+                {this.makeInput("b_hema_blue", "blue")}
+              </div>
+              <div className="eosin">
+                <span>Eosin:</span>
+                {this.makeInput("b_eosin_red", "red")}
+                {this.makeInput("b_eosin_green", "green")}
+                {this.makeInput("b_eosin_blue", "blue")}
+              </div>
             </div>
           </div>
         </div>
