@@ -21,7 +21,7 @@ class App extends React.Component {
       b_eosin_green: 0.5,
       b_eosin_blue: 0.5,
       k: 2.5,
-      imageLink: 'http://openseadragon.github.io/example-images/highsmith/highsmith.dzi',
+      imageLink: 'https://openseadragon.github.io/example-images/highsmith/highsmith.dzi',
     }
     // this is needed so we can clear the osd div each load
     // otherwise osd just makes a new layout for each button click
